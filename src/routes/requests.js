@@ -15,7 +15,7 @@ requestRouter.post(
       const toUserId = req.params.toUserId;
       const status = req.params.status;
 
-      const allowedstatus = ["ignored", "interested"];
+      const allowedstatus = ["ignore", "interested"];
       if (!allowedstatus.includes(status)) {
         return res
           .status(400)
@@ -49,7 +49,7 @@ requestRouter.post(
       const data = await connectionRequst.save();
 
       res.json({
-        message: req.user.firstName  +  "is"  +   status + "in"  +  toUser.firstName,
+        message: req.user.firstName  +  "is"   + "  " +   status + "in"  +  toUser.firstName,
         data,
       });
     } catch (err) {
@@ -88,7 +88,7 @@ requestRouter.post("/request/review/:status/:requestId" , userAuth , async(req,r
     connectionRequest.status=status;
     const data = await connectionRequest.save();
 
-    res.json({message: "connection request" + status , data});
+    res.json({message: "connection request"  +"  " + status , data});
 
   }catch(err){
 

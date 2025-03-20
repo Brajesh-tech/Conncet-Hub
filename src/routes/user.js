@@ -20,7 +20,6 @@ userRouter.get("/user/requests/received", userAuth, async (req, res) => {
       "fromUserId",
       "firstName lastName photoUrl age gender about skills"
     );
-    console.log(connectionRequest)
 
     res.json({
         messsage:"Data fetched succesfully",
@@ -42,7 +41,6 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
       })
         .populate("fromUserId", USER_SAFE_DATA)
         .populate("toUserId", USER_SAFE_DATA);
-      console.log(connectionRequests);
       const data = connectionRequests.map((row) => {
         if (row.fromUserId._id.toString() === loggedInUser._id.toString()) {
           return row.toUserId;
@@ -63,7 +61,7 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
       let limit = parseInt(req.query.limit) || 10;
       limit = limit > 50 ? 50 : limit;
       const skip = (page - 1) * limit;
-      const connectionRequests = await ConnectionRequest.find({
+      const connectionRequests = await ConnectionRequests.find({
         $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
       }).select("fromUserId  toUserId");
       const hideUsersFromFeed = new Set();
