@@ -84,4 +84,83 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
     }
   });
 
+
+  // userRouter.get("/search", async (req, res) => {
+  //   try {
+  //     const { name } = req.query;  // Get the search name from query parameter
+  //     const page = parseInt(req.query.page) || 1;
+  //     let limit = parseInt(req.query.limit) || 10;
+  //     limit = limit > 50 ? 50 : limit;  // Limit the number of results to avoid overload
+  //     const skip = (page - 1) * limit;  // Skip users based on the page number
+  
+  //     // If name parameter is provided, search based on firstName or lastName
+  //     let userQuery = {};
+  //     if (name) {
+  //       userQuery = {
+  //         $or: [
+  //           { firstName: { $regex: name, $options: 'i' } }, // Case-insensitive search on firstName
+  //           { lastName: { $regex: name, $options: 'i' } }    // Case-insensitive search on lastName
+  //         ]
+  //       };
+  //     }
+  
+  //     // Log the final query to debug
+  //     console.log("Final User Query:", JSON.stringify(userQuery, null, 2));
+  
+  //     // Fetch users based on the name query and pagination
+  //     const users = await User.find(userQuery)
+  //       .select("firstName lastName emailId skills photoUrl") // Customize the fields you want to return
+  //       .skip(skip)
+  //       .limit(limit);
+  
+  //     res.json({ data: users });
+  //   } catch (err) {
+  //     res.status(400).json({ message: err.message });
+  //   }
+  // });
+  
+
+  userRouter.get("/search", userAuth, async (req, res) => {
+    try {
+      const { name } = req.query;  // Get the search name from the query parameter
+      const page = parseInt(req.query.page) || 1;
+      let limit = parseInt(req.query.limit) || 10;
+      limit = limit > 50 ? 50 : limit;  // Limit the number of results to avoid overload
+      const skip = (page - 1) * limit;  // Skip users based on the page number
+  
+      // If the name parameter is provided, search based on firstName or lastName
+      let userQuery = {};
+      if (name) {
+        userQuery = {
+          $or: [
+            { firstName: { $regex: name, $options: 'i' } }, // Case-insensitive search on firstName
+            { lastName: { $regex: name, $options: 'i' } }    // Case-insensitive search on lastName
+          ]
+        };
+      }
+  
+      // Get the logged-in user (from the userAuth middleware)
+      const loggedInUser = req.user;
+  
+      // Log the final query to debug
+      console.log("Final User Query:", JSON.stringify(userQuery, null, 2));
+  
+      // Fetch users based on the query and pagination, excluding the logged-in user
+      const users = await User.find({
+        ...userQuery,
+        _id: { $ne: loggedInUser._id } // Exclude the logged-in user from the search results
+      })
+        .select("firstName lastName emailId skills photoUrl") // Fields to return in the response
+        .skip(skip)
+        .limit(limit);
+  
+      // Respond with the found users
+      res.json({ data: users });
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
+  });
+  
+  
+
 module.exports = userRouter;

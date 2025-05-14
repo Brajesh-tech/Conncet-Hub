@@ -3,6 +3,9 @@ const connectDB = require("./config/database");
 const app = express();
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const http = require("http");
+require("dotenv").config();
+
 
 app.use(cors({
   origin:  "http://localhost:5173",
@@ -15,11 +18,24 @@ const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/requests");
 const userRouter = require("./routes/user");
+const intializeSocket = require("./utils/socket");
+const chatRouter = require("./routes/chat");
+const paymentRouter = require("./routes/Payment");
+
+
 
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
+app.use("/", chatRouter);
+app.use("/", paymentRouter);
+
+const server =http.createServer(app)
+
+
+intializeSocket(server);
+
 
 
 // // Get user by email
@@ -101,7 +117,7 @@ app.use("/", userRouter);
 connectDB()
   .then(() => {
     console.log("Database connection established...");
-    app.listen(7777, () => {
+    server.listen(7777, () => {
       console.log("Server is successfully listening on port 7777...");
     });
   })
