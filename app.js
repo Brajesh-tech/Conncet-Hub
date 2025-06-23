@@ -9,7 +9,7 @@ require("dotenv").config();
 
 app.use(cors({
   origin: [  "http://localhost:5173",
-  "https://tiny-shortbread-3a2d79.netlify.app/"],
+  "https://stellar-swan-0dbe7c.netlify.app/"],
   credentials :true,
 }));
 app.use(express.json());
