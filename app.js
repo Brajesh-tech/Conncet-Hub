@@ -6,15 +6,33 @@ const cors = require("cors");
 const http = require("http");
 require("dotenv").config();
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://stellar-swan-0dbe7c.netlify.app"
+];
 
-app.use(cors({
-  origin: [  "http://localhost:5173",
-  "https://stellar-swan-0dbe7c.netlify.app/"],
-  credentials :true,
-}));
+// Setup CORS middleware
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true); // allow non-browser requests
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true
+  })
+);
+
+// Allow preflight requests
+app.options("*", cors());
+
 app.use(express.json());
 app.use(cookieParser());
 
+// Import routes
 const authRouter = require("./src/routes/auth");
 const profileRouter = require("./src/routes/profile");
 const requestRouter = require("./src/routes/requests");
@@ -23,8 +41,7 @@ const intializeSocket = require("./src/utils/socket");
 const chatRouter = require("./src/routes/chat");
 const paymentRouter = require("./src/routes/Payment");
 
-
-
+// Use routes
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
@@ -32,89 +49,13 @@ app.use("/", userRouter);
 app.use("/", chatRouter);
 app.use("/", paymentRouter);
 
-const server =http.createServer(app)
+// Create HTTP server
+const server = http.createServer(app);
 
-
+// Initialize WebSocket or Socket.IO
 intializeSocket(server);
 
-
-
-// // Get user by email
-// app.get("/user", async (req, res) => {
-//   const userEmail = req.body.emailId;
-
-//   try {
-//     console.log(userEmail);
-//     const user = await User.findOne({ emailId: userEmail });
-//     if (!user) {
-//       res.status(404).send("User not found");
-//     } else {
-//       res.send(user);
-//     }
-
-//     // const users = await User.find({ emailId: userEmail });
-//     // if (users.length === 0) {
-//     //   res.status(404).send("User not found");
-//     // } else {
-//     //   res.send(users);
-//     // }
-//   } catch (err) {
-//     res.status(400).send("Something went wrong ");
-//   }
-// });
-
-// // Feed API - GET /feed - get all the users from the database
-// app.get("/feed", async (req, res) => {
-//   try {
-//     const users = await User.find({});
-//     res.send(users);
-//   } catch (err) {
-//     res.status(400).send("Something went wrong ");
-//   }
-// });
-
-// // Detele a user from the database
-// app.delete("/user", async (req, res) => {
-//   const userId = req.body.userId;
-//   try {
-//     const user = await User.findByIdAndDelete({ _id: userId });
-//     //const user = await User.findByIdAndDelete(userId);
-//     res.send("User deleted successfully");
-//   } catch (err) {
-//     res.status(400).send("Something went wrong ");
-//   }
-// });
-
-// // Update data of the user
-// app.patch("/user/:userId", async (req, res) => {
-//   const userId = req.params?.userId;
-//   const data = req.body;
-//   try {
-//     const ALLOWED_UPDATES = ["photoUrl", "about", "gender", "age", "skills"];
-
-//     const isUpdateAllowed = Object.keys(data).every((k) =>
-//       ALLOWED_UPDATES.includes(k)
-//     );
-
-//     if (!isUpdateAllowed) {
-//       throw new Error("update not allowed");
-//     }
-
-//     if (data.skills.length > 10) {
-//       throw new Error("data not should be grater than 10");
-//     }
-
-//     const user = await User.findByIdAndUpdate({ _id: userId }, data, {
-//       returnDocument: "after",
-//       runValidators: true,
-//     });
-//     console.log(user);
-//     res.send("User updated successfully");
-//   } catch (err) {
-//     res.status(400).send("UPDATE FAILED:" + err.message);
-//   }
-// });
-
+// Connect to MongoDB and start server
 connectDB()
   .then(() => {
     console.log("Database connection established...");
@@ -123,5 +64,5 @@ connectDB()
     });
   })
   .catch((err) => {
-    console.error("Database cannot be connected!!");
+    console.error("Database connection failed:", err.message);
   });
