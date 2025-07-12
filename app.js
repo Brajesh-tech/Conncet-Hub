@@ -6,28 +6,15 @@ const cors = require("cors");
 const http = require("http");
 require("dotenv").config();
 
-const allowedOrigins = [
-  "http://localhost:5173",
- "https://dreamy-unicorn-094506.netlify.app"
-];
+
 
 // Setup CORS middleware
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // allow non-browser requests
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      } else {
-        return callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true
-  })
-);
+app.use(cors({
+  origin: "https://dreamy-unicorn-094506.netlify.app", // your frontend origin
+  credentials: true,
+}));
 
 // Allow preflight requests
-app.options("*", cors());
 
 app.use(express.json());
 app.use(cookieParser());
