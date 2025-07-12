@@ -2,8 +2,10 @@ const express = require("express");
 const { validatesignupData } = require("../utils/validate");
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
+
 const authRouter = express.Router();
 
+// SIGNUP ROUTE
 authRouter.post("/signup", async (req, res) => {
   try {
     validatesignupData(req);
@@ -21,19 +23,17 @@ authRouter.post("/signup", async (req, res) => {
     const savedUser = await user.save();
     const token = await savedUser.getJWT();
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
-      expires: new Date(Date.now() + 8 * 3600000),
+    res.status(201).json({
+      message: "User Added successfully!",
+      token, // send token in response
+      data: savedUser,
     });
-
-    res.json({ message: "User Added successfully!", data: savedUser });
   } catch (err) {
     res.status(400).send("Error saving the user: " + err.message);
   }
 });
 
+// LOGIN ROUTE
 authRouter.post("/login", async (req, res) => {
   try {
     const { emailId, password } = req.body;
@@ -47,28 +47,19 @@ authRouter.post("/login", async (req, res) => {
 
     const token = await user.getJWT();
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
-      expires: new Date(Date.now() + 8 * 3600000),
+    res.json({
+      message: "Login successful!",
+      token, // send token in response
+      data: user,
     });
-
-    res.json({ message: "Login successful!", data: user });
   } catch (err) {
     res.status(400).send("ERROR: " + err.message);
   }
 });
 
+// LOGOUT ROUTE (Client can just delete token from localStorage)
 authRouter.post("/logout", (req, res) => {
-  res.cookie("token", "", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "None",
-    expires: new Date(0),
-  });
-
-  res.send("Logged out successfully");
+  res.status(200).json({ message: "Logged out successfully" });
 });
 
 module.exports = authRouter;
