@@ -8,7 +8,7 @@ require("dotenv").config();
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://stellar-swan-0dbe7c.netlify.app"
+  "https://snazzy-pudding-922af8.netlify.app"
 ];
 
 // Setup CORS middleware
