@@ -3,13 +3,16 @@ const User = require("../models/user");
 
 const userAuth = async (req, res, next) => {
   try {
-    const token = req.cookies.token;
+    const authHeader = req.headers.authorization;
 
-    if (!token) return res.status(401).send("Please Login!!");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).send("Please Login!!");
+    }
 
+    const token = authHeader.split(" ")[1]; // Bearer <token>
     const decodedObj = jwt.verify(token, "DEV@TINDER&7481");
-    const user = await User.findById(decodedObj._id);
 
+    const user = await User.findById(decodedObj._id);
     if (!user) return res.status(401).send("User not found");
 
     req.user = user;

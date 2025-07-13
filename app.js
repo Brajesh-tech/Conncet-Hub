@@ -10,10 +10,11 @@ require("dotenv").config();
 
 // Setup CORS middleware
 app.use(cors({
-  origin: "https://dreamy-unicorn-094506.netlify.app", // your frontend origin
+  origin: "https://dreamy-unicorn-094506.netlify.app", // frontend origin
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
-
 // Allow preflight requests
 
 app.use(express.json());
