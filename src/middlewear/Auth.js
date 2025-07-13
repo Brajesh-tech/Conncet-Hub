@@ -3,8 +3,7 @@ const User = require("../models/user");
 
 const userAuth = async (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(" ")[1];
+    const token = req.cookies.token;
 
     if (!token) return res.status(401).send("Please Login!!");
 
