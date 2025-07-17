@@ -2,6 +2,7 @@ const express = require("express");
 const { validatesignupData } = require("../utils/validate");
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
+const { userAuth } = require("../middlewear/Auth");
 
 const authRouter = express.Router();
 
@@ -21,7 +22,7 @@ authRouter.post("/signup", async (req, res) => {
     });
 
     const savedUser = await user.save();
-    const token = await savedUser.getJWT();
+    const token =  savedUser.getJWT();
 
     res.status(201).json({
       message: "User Added successfully!",
@@ -45,9 +46,8 @@ authRouter.post("/login", async (req, res) => {
 
     if (!isPasswordValid) throw new Error("Password incorrect!");
 
-    const token = await user.getJWT();
-    console.log(token) ;
-
+    const token =  user.getJWT();
+   
     res.json({
       message: "Login successful!",
       token, // send token in response
@@ -57,6 +57,8 @@ authRouter.post("/login", async (req, res) => {
     res.status(400).send("ERROR: " + err.message);
   }
 });
+
+
 
 // LOGOUT ROUTE (Client can just delete token from localStorage)
 authRouter.post("/logout", (req, res) => {

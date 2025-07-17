@@ -6,15 +6,18 @@ const cors = require("cors");
 const http = require("http");
 require("dotenv").config();
 
-
-
 // Setup CORS middleware
-app.use(cors({
-  origin: "https://dreamy-unicorn-094506.netlify.app", // frontend origin
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
+app.use(
+  cors({
+    origin: [
+      "https://dreamy-unicorn-094506.netlify.app",
+      "http://localhost:5173",
+    ], // frontend origin
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 // Allow preflight requests
 
 app.use(express.json());
@@ -28,6 +31,7 @@ const userRouter = require("./src/routes/user");
 const intializeSocket = require("./src/utils/socket");
 const chatRouter = require("./src/routes/chat");
 const paymentRouter = require("./src/routes/Payment");
+const passwordRouter = require("./src/routes/passwordreset");
 
 // Use routes
 app.use("/", authRouter);
@@ -36,6 +40,7 @@ app.use("/", requestRouter);
 app.use("/", userRouter);
 app.use("/", chatRouter);
 app.use("/", paymentRouter);
+app.use("/", passwordRouter);
 
 // Create HTTP server
 const server = http.createServer(app);

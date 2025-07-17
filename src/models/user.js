@@ -78,13 +78,7 @@ const userSchema = new mongoose.Schema(
     skills: {
       type: [String],
     },
-    oldPasword:{
-      type:String
-    },
-    newPassword:{
-      type:String
-    }
-
+   
     
   
      
@@ -95,15 +89,12 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-userSchema.methods.getJWT = async function () {
-
-  const user=this;
-
-  const token = await jwt.sign({ _id: user._id }, "DEV@TINDER&7481", {
+userSchema.methods.getJWT = function () {
+  const user = this;
+  const token = jwt.sign({ _id: user._id }, "DEV@TINDER&7481", {
     expiresIn: "7d"
   });
-  return token
-  
+  return token;
 };
 
 userSchema.methods.verifyPassword = async function (passwordInputByUser) {
